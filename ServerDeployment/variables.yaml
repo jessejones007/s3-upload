@@ -1,0 +1,10 @@
+variables:
+  # Azure pipeline variables
+  - name: awsRegion
+    value: us-east-1
+  - name: awsCredentials
+    value: 'aws'
+  - name: s3BucketName
+    value: 'config-bucket-783119940407'
+  - name: sourceDirectory
+    value: 'ServerDeployment\databases\CopyS3andRestore.ps1'
