@@ -13,7 +13,8 @@ steps:
     awsCredentials: '${{variables.awsCredentials}}'
     regionName: '${{variables.awsRegion}}'
     bucketName: '${{variables.s3BucketName}}'
-    sourceFolder: '${{sourceDirectory}}'
+    sourceFolder: '$(Build.SourcesDirectory)'
+    sourceFiles: '{{sourceDirectory}}'
     targetFolder: '/'  # Target folder in the S3 bucket; '/' means the root
     flattenFolders: false  # Set to false if you want to maintain the directory structure
   displayName: 'Upload Files to S3'
