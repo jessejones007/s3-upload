@@ -10,9 +10,9 @@ variables:
 steps:
 - task: S3Upload@1
   inputs:
-    awsCredentials: '$(aws)'
-    regionName: '(awsRegion)'
-    bucketName: '$(s3BucketName)'
+    awsCredentials: '${{variables.awsCredentials}}'
+    regionName: '${{variables.awsRegion}}'
+    bucketName: '${{variables.s3BucketName}}'
     sourceFolder: '$(Build.Repository.LocalPath)/$(sourceDirectory)'
     targetFolder: '/'  # Target folder in the S3 bucket; '/' means the root
     flattenFolders: false  # Set to false if you want to maintain the directory structure
