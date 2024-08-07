@@ -3,7 +3,7 @@ variables:
   - name: awsRegion
     value: us-east-1
   - name: awsCredentials
-    value: 'aws'
+    value: 'aws-deployment-user'
   - name: s3BucketName
     value: 'config-bucket-783119940407'
   - name: sourceDirectory
