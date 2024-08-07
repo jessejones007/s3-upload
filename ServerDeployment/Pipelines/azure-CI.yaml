@@ -8,5 +8,12 @@ variables:
   - template: ../variables.yaml
 
 steps:
-- script: echo "This does nothing"
-  displayName: "I do nothing"
+- task: S3Upload@1
+  inputs:
+    awsCredentials: '$(aws)'
+    regionName: '(awsRegion)'
+    bucketName: '$(s3BucketName)'
+    sourceFolder: '$(Build.Repository.LocalPath)/$(sourceDirectory)'
+    targetFolder: '/'  # Target folder in the S3 bucket; '/' means the root
+    flattenFolders: false  # Set to false if you want to maintain the directory structure
+  displayName: 'Upload Files to S3'
