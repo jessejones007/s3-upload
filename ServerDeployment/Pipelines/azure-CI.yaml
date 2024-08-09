@@ -13,9 +13,9 @@ steps:
 
 - task: AWSCLI@1  # Azure DevOps task to run AWS CLI commands
   inputs:
-    awsCredentials: '${{variables.awsCredentials}}'  # Service connection name
-    regionName: '${{variables.awsRegion}}''
-    command: 's3 cp $(Build.SourcesDirectory)/ServerDeployment/databases s3://${{variables.s3BucketName}}/CopyS3andRestore.ps1'
+    awsCredentials: $(awsCredentials)  # Correct way to reference variables
+    regionName: $(awsRegion)  # Correct way to reference variables
+    command: 's3 cp $(Build.SourcesDirectory)/ServerDeployment/databases/CopyS3andRestore.ps1 s3://$(S3BucketName)/CopyS3andRestore.ps1'
   displayName: 'Upload Files to S3 using AWS CLI'
 
 - script: |
