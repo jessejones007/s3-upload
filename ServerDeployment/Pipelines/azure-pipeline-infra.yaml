@@ -13,7 +13,7 @@ steps:
   inputs:
     awsCredentials: '$(awsCredentials)'  # Referencing the variable from the included file
     regionName: '$(awsRegion)'
-    stackName: '$(stackName)'
+    stackName: 'My-Wynsure-Stack'
     templateFile: '$(Build.SourcesDirectory)/ServerDeployment/AwsAutomatedRestore/wynsure-dev-cf2.yaml'  # Adjust the path if necessary
     capabilities: 'CAPABILITY_IAM,CAPABILITY_NAMED_IAM,CAPABILITY_AUTO_EXPAND'
   displayName: 'Create or Update CloudFormation Stack'
