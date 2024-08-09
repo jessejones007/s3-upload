@@ -8,20 +8,15 @@ variables:
   - template: ../variables.yaml
 
 steps:
-# Step 1: Configure AWS credentials (if needed)
-- task: UseAwsCredentials@1
+# Step 1: Run a PowerShell script to upload the file to S3
+- task: PowerShell@2
   inputs:
-    awsCredentials: '${{variables.awsCredentials}}'  # Use the AWS service connection
-    regionName: '${{variables.awsRegion}}'
-
-# Step 2: List files in the directory (optional, for debugging)
-- script: |
-    echo "Listing files in the directory:"
-    dir $(Build.SourcesDirectory)/ServerDeployment/databases
-  displayName: 'List Files in Directory'
-
-# Step 3: Upload specific file to S3 using AWS CLI
-- script: |
-    echo "Uploading CopyS3andRestore.ps1 to S3"
-    aws s3 cp "$(Build.SourcesDirectory)\ServerDeployment\databases\CopyS3andRestore.ps1" "s3://$(variables.s3BucketName)/"
-  displayName: 'Upload File to S3 via AWS CLI'
+    targetType: 'inline'
+    script: |
+      # Assuming AWS CLI and AWS Tools for PowerShell are configured on the agent
+      $env:AWS_DEFAULT_REGION = "$(awsRegion)"
+      
+      # Upload file to S3 using AWS PowerShell Module
+      Write-Host "Uploading CopyS3andRestore.ps1 to S3..."
+      Write-S3Object -BucketName "$(s3BucketName)" -File "$(Build.SourcesDirectory)/ServerDeployment/databases/CopyS3andRestore.ps1" -Key "CopyS3andRestore.ps1"
+  displayName: 'Upload File to S3 via PowerShell'
