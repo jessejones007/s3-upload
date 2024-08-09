@@ -6,5 +6,5 @@ variables:
     value: 'aws-deployment-user'
   - name: s3BucketName
     value: 'config-bucket-783119940407'
-  - name: sourceDirectory
-    value: 'ServerDeployment\databases\CopyS3andRestore.ps1'
+  # - name: sourceDirectory
+  #   value: 'ServerDeployment\databases\CopyS3andRestore.ps1'

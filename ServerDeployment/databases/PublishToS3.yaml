@@ -1,0 +1,8 @@
+trigger:
+- none
+
+pool: AflacWindowsAgentPool
+
+steps:
+- script: echo "This does nothing"
+  displayName: "I do nothing"
