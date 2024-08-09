@@ -8,13 +8,17 @@ variables:
   - template: ../variables.yaml
 
 steps:
-- task: S3Upload@1
+- checkout: self
+  displayName: 'Checkout Repository'
+
+- task: AWSCLI@1  # Azure DevOps task to run AWS CLI commands
   inputs:
-    awsCredentials: '${{variables.awsCredentials}}'
-    regionName: '${{variables.awsRegion}}'
-    bucketName: '${{variables.s3BucketName}}'
-    # sourceFolder: '$(Build.SourcesDirectory)/ServerDeployment/databases/'
-    sourceFiles: '$(Build.SourcesDirectory)/ServerDeployment/databases/CopyS3andRestore.ps1'
-    targetFolder: ''  # Target folder in the S3 bucket; '/' means the root
-    flattenFolders: true  # Set to false if you want to maintain the directory structure
-  displayName: 'Upload Files to S3'
+    awsCredentials: 'your-aws-service-connection-name'  # Service connection name
+    regionName: $(awsRegion)
+    command: 's3 cp $(Build.SourcesDirectory)/$(sourceDirectory) s3://$(S3BucketName)/CopyS3andRestore.ps1'
+  displayName: 'Upload Files to S3 using AWS CLI'
+
+- script: |
+    echo "Listing directory structure for verification"
+    ls -R $(Build.SourcesDirectory)
+  displayName: 'Print Directory Structure'
