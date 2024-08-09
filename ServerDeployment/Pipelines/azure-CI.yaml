@@ -8,10 +8,13 @@ variables:
   - template: ../variables.yaml
 
 steps:
-# Step 1: Upload File to S3 via AWS CLI using a Bash Script
-- script: |
-    echo "Uploading CopyS3andRestore.ps1 to S3 using AWS CLI..."
-    aws s3 cp "$(Build.SourcesDirectory)/ServerDeployment/databases/CopyS3andRestore.ps1" "s3://$(s3BucketName)/"
-  displayName: 'Upload File to S3 via AWS CLI'
-  env:
-    AWS_DEFAULT_REGION: $(awsRegion)
+- task: S3Upload@1
+  inputs:
+    awsCredentials: '${{variables.awsCredentials}}'
+    regionName: '${{variables.awsRegion}}'
+    bucketName: '${{variables.s3BucketName}}'
+    sourceFolder: '$(Build.SourcesDirectory)/ServerDeployment/databases'
+    sourceFiles: 'CopyS3andRestore.ps1'
+    targetFolder: '/'  # Target folder in the S3 bucket; '/' means the root
+    flattenFolders: false  # Set to false if you want to maintain the directory structure
+  displayName: 'Upload Files to S3'
