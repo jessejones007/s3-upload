@@ -8,12 +8,20 @@ variables:
   - template: ../variables.yaml
 
 steps:
-# Step 1: Run a PowerShell script to upload the file to S3
+# Step 1: Install AWS Tools for PowerShell
 - task: PowerShell@2
   inputs:
     targetType: 'inline'
     script: |
-      # Assuming AWS CLI and AWS Tools for PowerShell are configured on the agent
+      Install-Module -Name AWSPowerShell.NetCore -Force -Scope CurrentUser
+  displayName: 'Install AWS Tools for PowerShell'
+
+# Step 2: Run a PowerShell script to upload the file to S3
+- task: PowerShell@2
+  inputs:
+    targetType: 'inline'
+    script: |
+      # Setting AWS region environment variable
       $env:AWS_DEFAULT_REGION = "$(awsRegion)"
       
       # Upload file to S3 using AWS PowerShell Module
