@@ -8,11 +8,10 @@ variables:
   - template: ../variables.yaml
 
 steps:
-# Step 1: Use PowerShell to Upload File to S3 via AWS CLI
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: |
-      echo "Uploading CopyS3andRestore.ps1 to S3 using AWS CLI..."
-      aws s3 cp "$(Build.SourcesDirectory)/ServerDeployment/databases/CopyS3andRestore.ps1" "s3://$(s3BucketName)/"
+# Step 1: Upload File to S3 via AWS CLI using a Bash Script
+- script: |
+    echo "Uploading CopyS3andRestore.ps1 to S3 using AWS CLI..."
+    aws s3 cp "$(Build.SourcesDirectory)/ServerDeployment/databases/CopyS3andRestore.ps1" "s3://$(s3BucketName)/"
   displayName: 'Upload File to S3 via AWS CLI'
+  env:
+    AWS_DEFAULT_REGION: $(awsRegion)
