@@ -13,18 +13,18 @@ steps:
     awsCredentials: '${{variables.awsCredentials}}'
     regionName: '${{variables.awsRegion}}'
     bucketName: '${{variables.s3BucketName}}'
-    sourceFolder: '$(Build.SourcesDirectory)/ServerDeployment/databases'
+    sourceFolder: '$(Build.SourcesDirectory)/ServerDeployment/databases/'
     sourceFiles: 'CopyS3andRestore.ps1'
     targetFolder: ''  # Target folder in the S3 bucket; '/' means the root
     flattenFolders: True  # Set to false if you want to maintain the directory structure
   displayName: 'Upload Files to S3'
 
 - script: |
-    echo "Checking for unwanted files in S3 and removing them"
-    aws s3 ls s3://$(variables.s3BucketName)/ --recursive | awk '{print $4}' | while read file; do
-      if [ "$file" != "CopyS3andRestore.ps1" ]; then
-        echo "Deleting unwanted file: $file"
-        aws s3 rm s3://$(variables.s3BucketName)/$file
+    echo "Removing unwanted files from S3 bucket"
+    aws s3 ls s3://${{ variables.s3BucketName }}/ | awk '{print $4}' | while read file; do
+      if [ "$file" != "CopyS3andRestore.ps1" ] && [ "$file" != "" ]; then
+        echo "Deleting $file from S3 bucket"
+        aws s3 rm s3://${{ variables.s3BucketName }}/$file
       fi
     done
   displayName: 'Remove Unwanted Files from S3'
