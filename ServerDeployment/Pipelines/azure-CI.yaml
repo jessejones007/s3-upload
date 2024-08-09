@@ -15,6 +15,6 @@ steps:
     bucketName: '${{variables.s3BucketName}}'
     sourceFolder: '$(Build.SourcesDirectory)/ServerDeployment/databases/CopyS3andRestore.ps1'
     sourceFiles: 'CopyS3andRestore.ps1'
-    targetFolder: '/'  # Target folder in the S3 bucket; '/' means the root
-    flattenFolders: false  # Set to false if you want to maintain the directory structure
+    targetFolder: ''  # Target folder in the S3 bucket; '/' means the root
+    flattenFolders: true  # Set to false if you want to maintain the directory structure
   displayName: 'Upload Files to S3'
