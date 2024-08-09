@@ -8,23 +8,11 @@ variables:
   - template: ../variables.yaml
 
 steps:
-# Step 1: Install AWS Tools for PowerShell
+# Step 1: Use PowerShell to Upload File to S3 via AWS CLI
 - task: PowerShell@2
   inputs:
     targetType: 'inline'
     script: |
-      Install-Module -Name AWSPowerShell.NetCore -Force -Scope CurrentUser
-  displayName: 'Install AWS Tools for PowerShell'
-
-# Step 2: Run a PowerShell script to upload the file to S3
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: |
-      # Setting AWS region environment variable
-      $env:AWS_DEFAULT_REGION = "$(awsRegion)"
-      
-      # Upload file to S3 using AWS PowerShell Module
-      Write-Host "Uploading CopyS3andRestore.ps1 to S3..."
-      Write-S3Object -BucketName "$(s3BucketName)" -File "$(Build.SourcesDirectory)/ServerDeployment/databases/CopyS3andRestore.ps1" -Key "CopyS3andRestore.ps1"
-  displayName: 'Upload File to S3 via PowerShell'
+      echo "Uploading CopyS3andRestore.ps1 to S3 using AWS CLI..."
+      aws s3 cp "$(Build.SourcesDirectory)/ServerDeployment/databases/CopyS3andRestore.ps1" "s3://$(s3BucketName)/"
+  displayName: 'Upload File to S3 via AWS CLI'
