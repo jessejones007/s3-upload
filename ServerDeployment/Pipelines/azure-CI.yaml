@@ -13,7 +13,7 @@ steps:
     awsCredentials: '${{variables.awsCredentials}}'
     regionName: '${{variables.awsRegion}}'
     bucketName: '${{variables.s3BucketName}}'
-    sourceFolder: '$(Build.SourcesDirectory)/ServerDeployment/databases/CopyS3andRestore.ps1'
+    sourceFolder: '$(Build.SourcesDirectory)/ServerDeployment/databases/'
     sourceFiles: 'CopyS3andRestore.ps1'
     targetFolder: ''  # Target folder in the S3 bucket; '/' means the root
     flattenFolders: true  # Set to false if you want to maintain the directory structure
