@@ -23,7 +23,7 @@ steps:
     awsCredentials: 'aws-deployment-user'
     regionName: 'us-east-1'
     awsCommand: 's3' 
-    awsSubCommand: 'cp $(Build.SourcesDirectory)/ServerDeployment/databases/CopyS3andRestore.ps1 s3://$(S3BucketName)/CopyS3andRestore.ps1'
+    awsSubCommand: 'cp $../ServerDeployment/databases/CopyS3andRestore.ps1 s3://$(s3BucketName)/CopyS3andRestore.ps1'
 
 - script: |
     echo "Listing directory structure for verification"
