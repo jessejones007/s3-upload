@@ -9,4 +9,4 @@ variables:
   # - name: sourceDirectory
   #   value: 'ServerDeployment\databases\CopyS3andRestore.ps1'
   - name: sourceDirectory
-    value: 'ServerDeployment\databases\'
+    value: 'ServerDeployment/databases/'
