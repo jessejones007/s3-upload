@@ -21,11 +21,17 @@ steps:
 
 - script: |
     echo "Removing unwanted files from S3 bucket"
-    aws s3 ls s3://${{ variables.s3BucketName }}/ --recursive
-    aws s3 ls s3://${{ variables.s3BucketName }}/ --recursive | awk '{print $4}' | while read file; do
-      if [ "$file" != "CopyS3andRestore.ps1" ] && [ "$file" != "" ]; then
+    files_to_delete=$(aws s3 ls s3://${{ variables.s3BucketName }}/ --recursive | awk '{print $4}' | grep -v "CopyS3andRestore.ps1")
+    
+    echo "Files to delete:"
+    echo "$files_to_delete"
+    
+    if [ -n "$files_to_delete" ]; then
+      for file in $files_to_delete; do
         echo "Deleting $file from S3 bucket"
-        aws s3 rm s3://${{ variables.s3BucketName }}/$file
-      fi
-    done
+        aws s3 rm s3://${{ variables.s3BucketName }}/$file || echo "Failed to delete $file"
+      done
+    else
+      echo "No unwanted files found."
+    fi
   displayName: 'Remove Unwanted Files from S3'
