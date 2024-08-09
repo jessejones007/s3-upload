@@ -1,0 +1,152 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Resources:
+
+  MySSMAutomationDocument:
+    Type: 'AWS::SSM::Document'
+    Properties:
+      DocumentType: 'Automation'
+      Name: "MySSMAutomationDocument"
+      Content:
+        schemaVersion: '0.3'
+        description: 'My sample SSM Automation document'
+        parameters:
+          DBFILEKEY:
+            type: String
+            description: "(Required) The key of the database to restore"
+            default: ""
+          BUCKET:
+            type: String
+            description: "(Required) The bucket of the database to restore"
+            default: ""
+        mainSteps:
+          - name: runCommand
+            action: 'aws:runCommand'
+            inputs:
+              DocumentName: 'AWS-RunPowerShellScript'
+              InstanceIds:
+                - i-0ee26ab81aaa0bc5e
+              Parameters:      
+                workingDirectory: 'C:\Users\Administrator\Desktop\'
+                commands:
+                  - 'C:\Users\Administrator\Desktop\CopyS3andRestore.ps1 {{DBFILEKEY}} {{BUCKET}}'
+
+  TempAflWynsureLambdaExecutionRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: 'Allow'
+            Principal:
+              Service: 'lambda.amazonaws.com'
+            Action: 'sts:AssumeRole'
+          - Effect: "Allow"
+            Principal:
+              Service: "ssm.amazonaws.com"
+            Action: "sts:AssumeRole"            
+      Policies:
+        - PolicyName: 'TempAflLambdaSSMPolicy'
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: 'Allow'
+                Action:
+                  - 'logs:CreateLogGroup'
+                  - 'logs:CreateLogStream'
+                  - 'logs:PutLogEvents'
+                  - 'ssm:SendCommand'
+                Resource: '*'
+              - Effect: "Allow"
+                Action:
+                  - "ssm:SendCommand"
+                  - "ssm:StartAutomationExecution"
+                  - "ssm:DescribeInstanceInformation"
+                  - "ssm:ListCommands"
+                  - "ssm:ListCommandInvocations"
+                  - "ec2:DescribeInstances"
+                Resource: "*"                
+
+  MyLambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: 'InvokeSSMAutomationDocument'
+      Handler: 'index.handler'
+      Role:
+        Fn::GetAtt:
+          - 'TempAflWynsureLambdaExecutionRole'
+          - 'Arn'
+      Code:
+        ZipFile: |
+          import json
+          import boto3
+          from botocore.exceptions import ClientError
+
+          ssm = boto3.client('ssm')
+
+          def handler(event, context):
+              automation_document_name = "MySSMAutomationDocument"
+              print (json.dumps(event))
+
+              try:
+                  response = ssm.start_automation_execution(
+                      DocumentName=automation_document_name,
+                      Parameters={
+                              'DBFILEKEY': [
+                                  event["detail"]["object"]["key"],
+                              ],
+                              'BUCKET': [
+                                  event["detail"]["bucket"]["name"],
+                              ]                              
+                      }                      
+                  )
+
+                  print(f"Automation execution started successfully: {json.dumps(response)}")
+
+                  return {
+                      'statusCode': 200,
+                      'body': json.dumps('Automation execution started successfully!')
+                  }
+              except ClientError as e:
+                  print(f"Error starting automation execution: {e}")
+
+                  return {
+                      'statusCode': 500,
+                      'body': json.dumps(f"Error starting automation execution: {e}")
+                  }
+      Runtime: 'python3.9'
+      Timeout: 30
+      MemorySize: 128
+
+  EventRule:
+    Type: 'AWS::Events::Rule'
+    Properties:
+      EventBusName: "default"
+      EventPattern:
+        source:
+          - "aws.s3"
+        detail-type:
+          - "Object Created"
+        detail:
+          object:
+            key:
+              - wildcard: "backups/IDDWSSQL01/db_WmigrateStaging/*.bak"          
+        resources:
+          - "arn:aws:s3:::db-wynsure-backups"
+      Targets:
+        - Arn:
+            Fn::GetAtt:
+              - MyLambdaFunction
+              - Arn
+          Id: "TargetInvokeSSMAutomationDocumentLambda"
+  
+  LambdaInvokePermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName:
+        Ref: 'MyLambdaFunction'
+      Action: 'lambda:InvokeFunction'
+      Principal: 'events.amazonaws.com'
+      SourceArn:
+        Fn::GetAtt:
+          - EventRule
+          - Arn
