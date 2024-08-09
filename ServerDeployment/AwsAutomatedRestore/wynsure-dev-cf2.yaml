@@ -24,7 +24,7 @@ Resources:
             inputs:
               DocumentName: 'AWS-RunPowerShellScript'
               InstanceIds:
-                - i-0ee26ab81aaa0bc5e
+                - i-05228bfd3e5167e85
               Parameters:      
                 workingDirectory: 'C:\Users\Administrator\Desktop\'
                 commands:
